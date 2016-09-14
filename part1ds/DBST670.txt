@@ -1,0 +1,1 @@
+An introduction to the knowledge, skills, and tools needed to successfully administer operational database systems. The conceptual and operational tools for analysis and resolution of problems such as performance, recovery, design, and technical issues are provided. Tools used to assist in the administration process are also included.

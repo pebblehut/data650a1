@@ -1,0 +1,1 @@
+An introduction to information systems infrastructure. Focus is on data communications and networks. Discussion covers layered network architectures and communication hardware. Emerging technologies such as social media, mobile computing, cloud computing, big data, and the Internet of Things are also examined.

@@ -1,0 +1,1 @@
+A continuation of the study of relational database systems, exploring advanced concepts. Topics include logical design, physical design, performance, architecture, data distribution, and data sharing in relational databases. The concepts of object-relational design and implementation are introduced and developed. Assignments require the use of a remote access laboratory.

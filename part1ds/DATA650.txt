@@ -1,0 +1,1 @@
+Prerequisite: DATA 640. Introduces concepts and techniques in managing and analyzing large data sets for data discovery and modeling. Topics include understanding unstructured data sets, distributed file systems and map-reduce technology (e.g., Hadoop) allowing the student to leverage the power of untapped institutional data.

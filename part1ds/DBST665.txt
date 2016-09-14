@@ -1,0 +1,1 @@
+An introduction to the technology approaches for successfully designing and implementing a data warehouse for structured and unstructured data. Topics include data modeling techniques; extraction, transformation, and loading of data; performance challenges; and system tradeoffs in the development of the warehouse environment. Assignments require use of a remote access laboratory.

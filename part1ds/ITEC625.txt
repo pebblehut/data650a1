@@ -1,0 +1,1 @@
+An introduction to the evolution of computer systems design and hardware and software architectures. Focus is on computer organization (classical and advanced architectures), operating systems, and applications development. Emerging developments in computer systems architecture are also examined.
