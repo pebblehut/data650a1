@@ -1,13 +1,15 @@
 install.packages("tm")
 library("tm")
 
-setwd("/Users/davidstonehouse/GitHub/DATA650Assign1/part1ds")
-dir(".")
+setwd("~/GitHub/DATA650Assign1")
+dir("part1ds")
 
-docs <- Corpus(DirSource("."))
+docs <- Corpus(DirSource("part1ds"))
+meta(docs[[1]], "id")
+
 summary(docs)
 data.frame(text=unlist(sapply(docs, '[', "content")), stringsAsFactors=F)
-docs[[1]]$content
+
 # Remove Punctuation and Special Characters -------------------------------
 docs <- tm_map(docs, removePunctuation)
 data.frame(text=unlist(sapply(docs, '[', "content")), stringsAsFactors = F)
