@@ -50,6 +50,12 @@ ord
 m <-as.matrix(dtm)
 dim(m)
 m
+# From Yelena: how to have named rows for m
+fnames <- dir("part1ds")
+rownames(m) <- fnames
+m
+meta(docs, type="local", tag="id") <- fnames
+
 
 findFreqTerms(dtm, lowfreq = 5)
 
@@ -59,6 +65,7 @@ findFreqTerms(dtm, lowfreq = 3)
 # Remove words that appear in less than 70% of documents
 dtms <- removeSparseTerms(dtm, 0.7)
 dtms
+
 
 # Word Associations -------------------------------------------------------
 # Want correlations >=0.75
