@@ -14,12 +14,12 @@ summary(docs)
 docs <- tm_map(docs, removePunctuation)
 # data.frame(text=unlist(sapply(docs, '[', "content")), stringsAsFactors = F)
 
-# for(j in seq(docs))
-# {
-#   docs[[j]] <-gsub("/", " ", docs[[j]])
-#   docs[[j]] <-gsub("@", " ", docs[[j]])
-#   docs[[j]] <-gsub("\\|", " ", docs[[j]])
-# }
+for(j in seq(docs))
+{
+  docs[[j]] <-gsub("/", " ", docs[[j]])
+  docs[[j]] <-gsub("@", " ", docs[[j]])
+  docs[[j]] <-gsub("\\|", " ", docs[[j]])
+}
 # inspect(docs)
 
 # Remove numeric characters -----------------------------------------------
@@ -36,7 +36,7 @@ docs<-tm_map(docs, removeWords, stopwords("english"))
 library(SnowballC)
 docs <- tm_map(docs, stemDocument)
 # Apply all these - now we have a corpus of plain docs:
-# docs <- tm_map(docs, PlainTextDocument)
+docs <- tm_map(docs, PlainTextDocument)
 meta(docs[[1]], "id")
 
 # Word Frequencies --------------------------------------------------------
@@ -69,24 +69,27 @@ findAssocs(dtm, c("data", "analysi", "warehous", "mine"), corlimit = 0.75)
 # install.packages("ggplot2")
 library(ggplot2)
 wf <- data.frame(word=names(freq), freq=freq)
-wf
+# wf
 p <- ggplot(subset(wf, freq>5), aes(word, freq))
 p <- p + geom_bar(stat="identity")
 p <- p + theme(axis.text.x=element_text(angle=45, hjust=1))
 p
 
 # Word Cloud --------------------------------------------------------------
+install.packages("wordcloud")
 library(wordcloud)
 dtms<-removeSparseTerms(dtm, 0.7)
 freq <- colSums(as.matrix(dtm)) # word frequencies
+wordcloud(names(freq), freq, min.freq=5)
 dark2 <- brewer.pal(12, "Dark2")
 wordcloud(names(freq), freq, max.words=100, rot.per=0.2, colors = dark2)
 
 # Cluster Dendogram -------------------------------------------------------
 
-install.packages("")
+#install.packages("fpc")
+#install.packages("cluster")
 library("cluster")
-library("fpc")
+library ("fpc")
 
 dtms <- removeSparseTerms(dtm, 0.8)
 d <- dist(t(dtms), method="euclidian")
