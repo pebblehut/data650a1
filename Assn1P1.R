@@ -8,36 +8,36 @@ docs <- Corpus(DirSource("part1ds"))
 meta(docs[[1]], "id")
 
 summary(docs)
-data.frame(text=unlist(sapply(docs, '[', "content")), stringsAsFactors=F)
+# data.frame(text=unlist(sapply(docs, '[', "content")), stringsAsFactors=F)
 
 # Remove Punctuation and Special Characters -------------------------------
 docs <- tm_map(docs, removePunctuation)
-data.frame(text=unlist(sapply(docs, '[', "content")), stringsAsFactors = F)
+# data.frame(text=unlist(sapply(docs, '[', "content")), stringsAsFactors = F)
 
-for(j in seq(docs))
-{
-  docs[[j]] <-gsub("/", " ", docs[[j]])
-  docs[[j]] <-gsub("@", " ", docs[[j]])
-  docs[[j]] <-gsub("\\|", " ", docs[[j]])
-}
-inspect(docs)
+# for(j in seq(docs))
+# {
+#   docs[[j]] <-gsub("/", " ", docs[[j]])
+#   docs[[j]] <-gsub("@", " ", docs[[j]])
+#   docs[[j]] <-gsub("\\|", " ", docs[[j]])
+# }
+# inspect(docs)
 
 # Remove numeric characters -----------------------------------------------
 docs<-tm_map(docs, removeNumbers)
-inspect(docs)
+# inspect(docs)
 
 # Remove Stopwords --------------------------------------------------------
 
 docs<-tm_map(docs, removeWords, stopwords("english"))
-inspect(docs)
+# inspect(docs)
 
 # Stemming ----------------------------------------------------------------
 #install.packages("SnowballC")
 library(SnowballC)
 docs <- tm_map(docs, stemDocument)
 # Apply all these - now we have a corpus of plain docs:
-docs <- tm_map(docs, PlainTextDocument)
-
+# docs <- tm_map(docs, PlainTextDocument)
+meta(docs[[1]], "id")
 
 # Word Frequencies --------------------------------------------------------
 dtm <- DocumentTermMatrix(docs)
