@@ -7,7 +7,7 @@ dir(".")
 docs <- Corpus(DirSource("."))
 summary(docs)
 data.frame(text=unlist(sapply(docs, '[', "content")), stringsAsFactors=F)
-
+docs[[1]]$content
 # Remove Punctuation and Special Characters -------------------------------
 docs <- tm_map(docs, removePunctuation)
 data.frame(text=unlist(sapply(docs, '[', "content")), stringsAsFactors = F)
