@@ -1,4 +1,4 @@
-install.packages("tm")
+# install.packages("tm")
 library("tm")
 
 setwd("~/GitHub/DATA650Assign1")
@@ -32,7 +32,7 @@ docs<-tm_map(docs, removeWords, stopwords("english"))
 inspect(docs)
 
 # Stemming ----------------------------------------------------------------
-install.packages("SnowballC")
+#install.packages("SnowballC")
 library(SnowballC)
 docs <- tm_map(docs, stemDocument)
 # Apply all these - now we have a corpus of plain docs:
