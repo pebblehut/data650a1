@@ -52,16 +52,21 @@ dim(m)
 m
 
 findFreqTerms(dtm, lowfreq = 5)
+
+# Run with lower bound - find more trend words specific to the Data Analytics degree
+findFreqTerms(dtm, lowfreq = 3)
+
 # Remove words that appear in less than 70% of documents
 dtms <- removeSparseTerms(dtm, 0.7)
 dtms
 
 # Word Associations -------------------------------------------------------
 # Want correlations >=0.75
-findAssocs(dtm, c("data", "analysis", "methods", "mining"), corlimit = 0.75)
-
+# findAssocs(dtm, c("data", "analysis", "methods", "mining"), corlimit = 0.75)
+findAssocs(dtm, c("data", "analysi", "warehous", "mine"), corlimit = 0.75)
 
 # Word Frequency Plots ----------------------------------------------------
+# install.packages("ggplot2")
 library(ggplot2)
 wf <- data.frame(word=names(freq), freq=freq)
 wf
