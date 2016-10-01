@@ -39,9 +39,48 @@ docs <- tm_map(docs, stemDocument)
 docs <- tm_map(docs, PlainTextDocument)
 meta(docs[[1]], "id")
 
-# Word Frequencies --------------------------------------------------------
+# From Yelena: clean up the metadata
+fnames <- dir("RaleighCityCouncil/worktxt")
+meta(docs, type="local", tag="id") <- fnames
+meta(docs[[1]], "id")
+# rownames(m) <- fnames
+# m
+
 dtm <- DocumentTermMatrix(docs)
 dtm
+
+
+# Create DTMs with bounds on frequency --------------------------------------------------------------
+
+# Creating a seriew of DTMs, each going further to exclude overly common words.
+
+ndocs <- length(dtm)
+# For all of these, ignore overly sparse terms (appearing in more than one document)
+minDocFreq <- ndocs * 0.2
+# ignore terms appearing in all of the documents
+# ignore overly common terms (appearing in all of the documents)
+maxDocFreq <- ndocs * 0.99
+dtm99<- DocumentTermMatrix(docs, control = list(bounds = list(global = c(minDocFreq, maxDocFreq))))
+dtm99                         
+# Go further and remove words that show up in almost every document
+maxDocFreq <- ndocs * 0.8
+dtm8<- DocumentTermMatrix(docs, control = list(bounds = list(global = c(minDocFreq, maxDocFreq))))
+dtm8                         
+
+# Find Frequent Terms --------------------------------------------------------
+findFreqTerms(dtm, lowfreq = 45)
+findFreqTerms(dtm99, lowfreq = 15)
+findFreqTerms(dtm8, lowfreq = 10)
+
+# Word Cloud --------------------------------------------------------------
+#install.packages("wordcloud")
+library(wordcloud)
+freq <- colSums(as.matrix(dtm)) # word frequencies
+wordcloud(names(freq), freq, min.freq=45)
+dark2 <- brewer.pal(12, "Dark2")
+wordcloud(names(freq), freq, max.words=100, rot.per=0.2, colors = dark2)
+
+# Word Frequencies --------------------------------------------------------
 freq <- colSums(as.matrix(dtm))
 freq
 length(freq)
@@ -50,21 +89,6 @@ ord
 m <-as.matrix(dtm)
 dim(m)
 m
-# From Yelena: how to have named rows for m
-fnames <- dir("part1ds")
-rownames(m) <- fnames
-m
-meta(docs, type="local", tag="id") <- fnames
-
-
-findFreqTerms(dtm, lowfreq = 45)
-
-# Run with lower bound - find more trend words specific to the Data Analytics degree
-findFreqTerms(dtm, lowfreq = 3)
-
-# Remove words that appear in less than 70% of documents
-dtms <- removeSparseTerms(dtm, 0.7)
-dtms
 
 
 # Word Associations -------------------------------------------------------
@@ -81,15 +105,6 @@ p <- ggplot(subset(wf, freq>5), aes(word, freq))
 p <- p + geom_bar(stat="identity")
 p <- p + theme(axis.text.x=element_text(angle=45, hjust=1))
 p
-
-# Word Cloud --------------------------------------------------------------
-install.packages("wordcloud")
-library(wordcloud)
-dtms<-removeSparseTerms(dtm, 0.7)
-freq <- colSums(as.matrix(dtm)) # word frequencies
-wordcloud(names(freq), freq, min.freq=5)
-dark2 <- brewer.pal(12, "Dark2")
-wordcloud(names(freq), freq, max.words=100, rot.per=0.2, colors = dark2)
 
 # Cluster Dendogram -------------------------------------------------------
 
@@ -116,3 +131,23 @@ kfit <- kmeans(d,4)
 kfit
 clusplot(as.matrix(d), kfit$cluster, color=T, shade=T, labels=2, lines=0)
 plotcluster(d, kfit$cluster)
+
+           
+
+# Bigger Stop List --------------------------------------------------------
+
+# Create a bigger stop words list with words that are in every document:
+dtm01 <- removeSparseTerms(dtm, 0.01)
+dtm01
+# Dumping the words here - represent formalities of meeting minutes, titles
+colnames(dtm01)
+commonWords <- colnames(dtm01)
+myStopWords <- c(stopwords("english"),commonWords)
+myStopWords
+docsNoCommon <-tm_map(docs, removeWords, myStopWords)
+inspect(docsNoCommon)
+dtmNoCommon <- DocumentTermMatrix(docsNoCommon)
+dtmNoCommon01 <- removeSparseTerms(dtmNoCommon, 0.01)
+dtmNoCommon01
+colnames(dtmNoCommon01)
+
