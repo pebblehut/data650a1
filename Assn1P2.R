@@ -98,6 +98,42 @@ MyTopWords(dtm99, num.words=20)
 # Want correlations >=0.9
 findAssocs(dtm99, c("leesvill", "trailwood", "stormwat", "birch"), corlimit = 0.9)
 
+
+# Create IDF --------------------------------------------------------------
+m <- as.matrix(dtm99)
+#m[ ,1:10]
+
+ncorpus <- nrow(m)
+
+MyIDF <- function(column, ndocs.total) {
+  idf <- 0
+  ndocs.found <- 0
+  for (i in 1:length(column)) {
+    if (column[i] > 0) 
+      ndocs.found <- ndocs.found + 1
+  }
+  if (ndocs.found > 0)
+    idf = log (1 + ndocs.total / ndocs.found)
+  idf 
+}
+m.idf <- apply(m, 2, function(r) MyIDF(r,ncorpus))
+
+m.tf.idf <- m
+for (i in 1:nrow(m)) {
+  for (j in 1:ncol(m)) {
+    m.tf.idf[i,j] <- m.tf.idf[i,j] * m.idf[j]
+  }
+}
+m[ ,1:10]
+m.tf.idf[ ,1:10]
+m.idf[1:10]
+m.freq <- colSums(m)
+m.freq[1:10]
+m.tf.idf.total <- colSums(m.tf.idf)
+m.tf.idf.total[1:10]
+m[ ,"leesvill"]
+m.tf.idf[ , "leesvill"]
+
 # Word Frequency Plots ----------------------------------------------------
 # install.packages("ggplot2")
 library(ggplot2)
@@ -117,6 +153,24 @@ MyFreqPlot(as.matrix(dtm))
 MyFreqPlot(as.matrix(dtm99))
 MyFreqPlot(m.tf.idf)
 
+# subset just the terms with the highest tf-idf value ---------------------
+
+# First, add the tf-idf totals per term as an additional row
+m.tf.idf.tmp <- m.tf.idf
+m.tf.idf.tmp <- rbind(m.tf.idf.tmp, m.tf.idf.total)
+m.tf.idf.tmp[ ,1:10]
+
+# Now prepare for subset command - transpose terms to be rows
+m.tf.idf.transpose <- t(m.tf.idf.tmp)
+m.tf.idf.transpose[1:9,]
+dim(m.tf.idf.transpose)
+
+# subset on the tf-idf-total - experiment on the threshold  
+# but drop tf-idf-total by only getting columns 1:ncorpus
+m.tf.idf.transpose2 <- subset(m.tf.idf.transpose, m.tf.idf.total > 30, c(1:ncorpus))
+dim(m.tf.idf.transpose2)
+#m.tf.idf.transpose2
+
 # Cluster Dendogram -------------------------------------------------------
 
 #install.packages("fpc")
@@ -124,41 +178,49 @@ MyFreqPlot(m.tf.idf)
 library("cluster")
 library ("fpc")
 
+PlotDendrogram <- function(tdm, num.clusters) {
+  #d <- dist(m.tf.idf.transpose2, method="euclidian")
+  
+  d <- dist(tdm, method="euclidian")
+  #d
+  fit <- hclust(d=d, method = "ward.D2")
+  plot(fit, hang=-1)
+  groups <- cutree(fit, k=num.clusters)
+  rect.hclust(fit, k=num.clusters, border="red")
+  fit
+}
+
 #dtms <- removeSparseTerms(dtm, 0.8)
 dtms <- removeSparseTerms(dtm99, 0.75)
 dtms
 inspect(dtms)
+fit <- PlotDendrogram(t(dtms), 4)
 
-mean(m.tf.idf.freq)
-summary(m.tf.idf.freq)
-
-d <- dist(m.tf.idf.transpose2, method="euclidian")
-
-d <- dist(t(dtms), method="euclidian")
-d
-fit <- hclust(d=d, method = "ward.D2")
-plot(fit, hang=-1)
-plot.new()
-plot(fit, hang=-1)
-groups <- cutree(fit, k=4)
-rect.hclust(fit, k=4, border="red")
-
+# This is too many terms - look for clusters using the cut function
 hcd <- as.dendrogram(fit)
-plot(cut(hcd, h=15)$upper, 
-     main="Upper tree of cut at h=75")
-plot(cut(hcd, h=15)$lower[[8]], 
-     main="Second branch # 8 of lower tree with cut at h=15")
+plot(cut(hcd, h=30)$upper, 
+     main="Upper tree of cut at h=30")
+plot(cut(hcd, h=30)$lower[[11]], 
+     main="Second branch # 11 of lower tree with cut at h=30")
+
+# Now do a plot of the tf-idf tdm
+fit <- PlotDendrogram(m.tf.idf.transpose2, 10)
 
 # K-means clustering ------------------------------------------------------
+DoKMeans <- function(tdm, num.clusters) {
+  d <- dist(tdm, method="euclidean")
+  kfit <- kmeans(d,num.clusters)
+  plotcluster(d, kfit$cluster)
+  clusplot(as.matrix(d), kfit$cluster, color=T, shade=T, labels=2, lines=0)
+  kfit
+}
 
+# First do K-Means using DTM without sparse terms
 dtms <- removeSparseTerms(dtm99, 0.75)
-d <- dist(t(dtms), method="euclidean")
-kfit <- kmeans(d,4)
-kfit
-clusplot(as.matrix(d), kfit$cluster, color=T, shade=T, labels=2, lines=0)
-plotcluster(d, kfit$cluster)
+kfit <- DoKMeans(t(dtms), 4)
 
-           
+# Now try with tf-idf
+kfit <- DoKMeans(m.tf.idf.transpose2,8)
 
 # Bigger Stop List --------------------------------------------------------
 
