@@ -71,14 +71,14 @@ library(wordcloud)
 
 MyWordCloud <- function(dtm) {
   freq <- colSums(as.matrix(dtm)) # word frequencies
-  dark2 <- brewer.pal(8, "Dark2")
+  # dark2 <- brewer.pal(8, "Dark2")
   # wordcloud(names(freq), freq, max.words=30, rot.per=0.2, colors = dark2)
   # wordcloud(names(freq), freq, scale=c(8,.2),min.freq=10,
   #           max.words=Inf, random.order=FALSE, rot.per=.15, colors=dark2)
-  pal <- brewer.pal(9, "BuGn")
+  pal <- brewer.pal(8, "Dark2")
+  # pal <- brewer.pal(9, "BuGn")
   pal <- pal[-(1:2)]
   wordcloud(names(freq), freq, scale=c(8,.3),min.freq=2,max.words=50, random.order=T, rot.per=.15, colors=pal, vfont=c("sans serif","plain"))
-  
 }
 
 MyWordCloud(dtm)
@@ -145,8 +145,9 @@ MyFreqPlot <- function(m) {
   words <- names(frequency)
   wf <- data.frame(word=words, freq=frequency)
   p <- ggplot(wf, aes(word, freq))
-  p <- p + geom_bar(stat="identity")
+  p <- p + geom_bar(stat="identity") + coord_flip()
   p <- p + theme(axis.text.x=element_text(angle=45, hjust=1))
+  p <- p + theme(text=element_text(face="bold",family="serif",size=20))
   p
 }
 MyFreqPlot(as.matrix(dtm))
@@ -204,7 +205,7 @@ plot(cut(hcd, h=30)$lower[[11]],
      main="Second branch # 11 of lower tree with cut at h=30")
 
 # Now do a plot of the tf-idf tdm
-fit <- PlotDendrogram(m.tf.idf.transpose2, 10)
+fit <- PlotDendrogram(m.tf.idf.transpose2, 8)
 
 # K-means clustering ------------------------------------------------------
 DoKMeans <- function(tdm, num.clusters) {
