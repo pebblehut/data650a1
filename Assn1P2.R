@@ -60,15 +60,13 @@ dtm
 # Creating a seriew of DTMs, each going further to exclude overly common words.
 
 ndocs <- length(dtm)
-# For all of these, ignore overly sparse terms (appearing in more than one document)
-minDocFreq <- ndocs * 0.2
 # ignore terms appearing in all of the documents
 maxDocFreq <- ndocs * 0.99
-dtm99<- DocumentTermMatrix(docs, control = list(bounds = list(global = c(minDocFreq, maxDocFreq))))
+dtm99<- DocumentTermMatrix(docs, control = list(bounds = list(global = c(1, maxDocFreq))))
 dtm99                         
 # Go further and remove words that show up in almost every document
 maxDocFreq <- ndocs * 0.8
-dtm8<- DocumentTermMatrix(docs, control = list(bounds = list(global = c(minDocFreq, maxDocFreq))))
+dtm8<- DocumentTermMatrix(docs, control = list(bounds = list(global = c(1, maxDocFreq))))
 dtm8                         
 
 # Find Frequent Terms --------------------------------------------------------
@@ -113,20 +111,20 @@ findAssocs(dtm99, c("leesvill", "trailwood", "stormwat", "birch"), corlimit = 0.
 # install.packages("ggplot2")
 library(ggplot2)
 
-MyFreqPlot <- function(dtm) {
-  freq <- colSums(as.matrix(dtm))
-  ord <- order(freq, decreasing = TRUE)
-  graphset <- freq[head(ord, 15)]  
-  graphset
-  wf <- data.frame(word=names(graphset), freq=graphset)
-  # wf
+MyFreqPlot <- function(m) {
+  frequency <- colSums(m)
+  frequency <- sort(frequency, decreasing=TRUE)
+  frequency <- frequency[1:15]
+  words <- names(frequency)
+  wf <- data.frame(word=words, freq=frequency)
   p <- ggplot(wf, aes(word, freq))
   p <- p + geom_bar(stat="identity")
   p <- p + theme(axis.text.x=element_text(angle=45, hjust=1))
   p
 }
-MyFreqPlot(dtm)
-MyFreqPlot(dtm99)
+MyFreqPlot(as.matrix(dtm))
+MyFreqPlot(as.matrix(dtm99))
+MyFreqPlot(m.tf.idf)
 
 # Cluster Dendogram -------------------------------------------------------
 
@@ -139,6 +137,11 @@ library ("fpc")
 dtms <- removeSparseTerms(dtm99, 0.75)
 dtms
 inspect(dtms)
+
+mean(m.tf.idf.freq)
+summary(m.tf.idf.freq)
+
+d <- dist(m.tf.idf.transpose2, method="euclidian")
 
 d <- dist(t(dtms), method="euclidian")
 d
