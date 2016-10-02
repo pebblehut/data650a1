@@ -39,6 +39,11 @@ docs<-tm_map(docs, removeNumbers)
 docs<-tm_map(docs, removeWords, stopwords("english"))
 inspect(docs)
 
+# Strip WhiteSpace --------------------------------------------------------
+
+docs<-tm_map(docs, stripWhitespace)
+inspect(docs)
+
 # Stemming ----------------------------------------------------------------
 #install.packages("SnowballC")
 library(SnowballC)
