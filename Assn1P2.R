@@ -21,26 +21,23 @@ for(j in seq(docs))
   docs[[j]] <-gsub("@", " ", docs[[j]])
   docs[[j]] <-gsub("\\|", " ", docs[[j]])
 }
+# This reveals that we removed our document names (IDs) in the process
 meta(docs[[1]], "id")
 # From Yelena: clean up the metadata
 docs <- tm_map(docs, PlainTextDocument)
 fnames <- dir("RaleighCityCouncil/worktxt")
 meta(docs, type="local", tag="id") <- fnames
 meta(docs[[1]], "id")
-# rownames(m) <- fnames
-# m
 
 # Remove numeric characters -----------------------------------------------
 docs<-tm_map(docs, removeNumbers)
 #inspect(docs)
 
 # Remove Stopwords --------------------------------------------------------
-
 docs<-tm_map(docs, removeWords, stopwords("english"))
 inspect(docs)
 
 # Strip WhiteSpace --------------------------------------------------------
-
 docs<-tm_map(docs, stripWhitespace)
 inspect(docs)
 
@@ -48,31 +45,25 @@ inspect(docs)
 #install.packages("SnowballC")
 library(SnowballC)
 docs <- tm_map(docs, stemDocument)
-# Apply all these - now we have a corpus of plain docs:
 
-
-dtm <- DocumentTermMatrix(docs)
-dtm
 
 
 # Create DTMs with bounds on frequency ------------------------------------------------------
+dtm <- DocumentTermMatrix(docs)
+dtm
 
-# Creating a seriew of DTMs, each going further to exclude overly common words.
-
+# Create a DTM that excludes words common to all documents
 ndocs <- length(dtm)
-# ignore terms appearing in all of the documents
+# ignore terms appearing in all of the documents 
+# This is a "brute force" way of removing the general stop words in this 
+# corpus. However, this could also remove a hot topic common to all documents!
 maxDocFreq <- ndocs * 0.99
 dtm99<- DocumentTermMatrix(docs, control = list(bounds = list(global = c(1, maxDocFreq))))
 dtm99                         
-# Go further and remove words that show up in almost every document
-maxDocFreq <- ndocs * 0.8
-dtm8<- DocumentTermMatrix(docs, control = list(bounds = list(global = c(1, maxDocFreq))))
-dtm8                         
 
 # Find Frequent Terms --------------------------------------------------------
 findFreqTerms(dtm, lowfreq = 45)
 findFreqTerms(dtm99, lowfreq = 15)
-findFreqTerms(dtm8, lowfreq = 10)
 
 # Word Cloud --------------------------------------------------------------
 #install.packages("wordcloud")
@@ -104,8 +95,8 @@ MyTopWords(dtm99)
 MyTopWords(dtm99, num.words=20)
 
 # Word Associations -------------------------------------------------------
-# Want correlations >=0.75
-findAssocs(dtm99, c("leesvill", "trailwood", "stormwat", "birch"), corlimit = 0.75)
+# Want correlations >=0.9
+findAssocs(dtm99, c("leesvill", "trailwood", "stormwat", "birch"), corlimit = 0.9)
 
 # Word Frequency Plots ----------------------------------------------------
 # install.packages("ggplot2")
